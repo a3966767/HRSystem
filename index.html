@@ -25,7 +25,7 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
 <head>
     <link rel="icon" href="Attendance-System/0rigin.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title data-i18n="APP_TITLE">APP_TITLE</title>
+    <title data-i18n="APP_TITLE">零點考勤系統</title>
     <link rel="stylesheet" href="./dist/compiled.css">
 
     <script>
@@ -120,7 +120,7 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
             <img src="/Attendance-System/0rigin.png" alt="打卡系統橫幅圖" class="main-image">
             <h1 id="appTitle" data-i18n="SUBTITLE_LOGIN" class="text-2xl font-bold text-gray-800 mb-2 dark:text-white">
                 歡迎文輝考勤系統</h1>
-            <p class="text-gray-600 mb-6" data-i18n="LOGIN_INFO" id="status">請點擊登入以繼續。</p>
+            <p class="text-gray-600 mb-6" data-i18n="LOGIN_INFO" id="status">正在與 LINE 伺服器安全連線中...</p>
             <div id="login" class="space-y-4">
                 <button id="login-btn" data-i18n="BTN_LOGOIN" class="w-full py-3 px-4 rounded-lg font-bold btn-primary"
                     style="display: none;">使用LINE登入</button>
@@ -158,17 +158,17 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
                         <div id="map-container"
                             class="w-full h-64 rounded-lg mb-4 bg-gray-200 flex items-center justify-center text-gray-500">
                             <div id="map-loading-text">
-                                <span data-i18n="MAP_LOADING">正在載入地圖...</span>
+                                <span data-i18n="MAP_LOADING">定位功能初始化中...</span>
                             </div>
                         </div>
                         <div class="bg-gray-50 p-4 dark:bg-gray-700 rounded-lg">
                             <p class="text-sm text-gray-600 dark:text-white">
                                 <strong data-i18n="LOCATION_STATUS_LABEL">狀態：</strong>
-                                <span id="location-status" ata-i18n="LOCATION_STATUS_PENDING">未偵測</span>
+                                <span id="location-status" ata-i18n="LOCATION_STATUS_PENDING">連線安全</span>
                             </p>
                             <p class="text-sm text-gray-600">
                                 <strong data-i18n="COORDINATES_LABEL">經緯度：</strong>
-                                <span id="location-coords" data-i18n="COORDINATES_UNKNOWN">未知</span>
+                                <span id="location-coords" data-i18n="COORDINATES_UNKNOWN">自動擷取中</span>
                             </p>
                         </div>
                     </div>
@@ -179,16 +179,8 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
                         <button id="punch-out-btn" data-i18n="PUNCH_OUT_LABEL"
                             class="w-full py-3 px-4 rounded-lg font-bold btn-secondary">下班打卡</button>
                     </div>
-                    <a href="https://lin.ee/9j5mzVH" target="_blank"
-                        class="p-4 flex items-center justify-center font-bold text-white rounded-lg shadow-lg transition duration-150 mt-6"
-                        style="
-                            text-decoration: none; 
-                            background-color: #00B900; /* LINE 較標準的綠色 */
-                            box-shadow: 0 4px #009900; /* 增加立體感 */
-                            display: none;
-                        ">
-                        <span class="mr-2 text-xl">💬</span>
-                        加入員工 LINE 頻道，掌握最新公告！
+                    <a href="#" id="custom-status-box" class="p-4 flex items-center justify-center font-bold text-white rounded-lg shadow-lg mt-6" style="background-color: #4f46e5; display: none;">
+                        系統提示訊息區
                     </a>
                 </div>
 
@@ -233,577 +225,168 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
                     </div>
                     <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
                 </div>
-
-                <div id="daily-records-card" class="card p-6" style="display: none;">
-                    <h4 id="daily-records-title" class="text-xl font-bold text-gray-800 mb-2 dark:text-white mb-1"></h4>
-                    <ul id="daily-records-list" class="space-y-3"></ul>
-                    <div id="daily-records-empty" data-i18n="DAILY_RECORDS_EMPTY" class="text-center text-gray-500 py-4"
-                        style="display: none;">
-                        該日沒有打卡紀錄。
-                    </div>
-                </div>
-            </section>
-
-            <!-- Location View -->
-            <section id="location-view" class="space-y-6" style="display: none;">
-                <div class="card p-6">
-                    <h2 data-i18n="CURRENT_LOCATION_TITLE"
-                        class="text-xl font-bold text-gray-800 mb-1 dark:text-white mb-1">當前位置</h2>
-                    <p data-i18n="CURRENT_LOCATION_DESCRIPTION" class="text-gray-500 mb-4">系統將透過 GPS 偵測您的位置。</p>
-
-                    <!-- <div id="map-container"
-                        class="w-full h-64 rounded-lg mb-4 bg-gray-200 flex items-center justify-center text-gray-500">
-                        <div id="map-loading-text">
-                            <span data-i18n="MAP_LOADING">正在載入地圖...</span>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 p-4 dark:bg-gray-700 rounded-lg">
-                        <p class="text-sm text-gray-600 dark:text-white">
-                            <strong data-i18n="LOCATION_STATUS_LABEL">狀態：</strong>
-                            <span id="location-status" ata-i18n="LOCATION_STATUS_PENDING">未偵測</span>
-                        </p>
-                        <p class="text-sm text-gray-600">
-                            <strong data-i18n="COORDINATES_LABEL">經緯度：</strong>
-                            <span id="location-coords" data-i18n="COORDINATES_UNKNOWN">未知</span>
-                        </p>
-                    </div> -->
-                </div>
-            </section>
-            <!-- Form View -->
-            <section id="Form-view" class="space-y-6" style="display: none;">
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-1 dark:text-white mb-1">
-                        未解鎖功能</h2>
-                    <p class="text-gray-500 mb-4">請聯絡開發人員</p>
-                </div>
-            </section>
-
-
-
             </section>
 
             <!-- Admin View -->
-
             <section id="admin-view" class="space-y-6" style="display: none;">
-
-                <!-- Tab Navigation -->
                 <div class="card p-3 ">
                     <div class="flex justify-center space-x-2">
-                        <!-- 1. 員工管理  -->
                         <button id="tab-employee-mgmt-btn" data-i18n="TAB_EMPLOYEE_MGMT"
                             class="py-2 px-4 rounded-full font-bold text-sm text-white bg-indigo-600">員工管理</button>
-                        <!-- 2. 打卡管理 -->
                         <button id="tab-punch-mgmt-btn" data-i18n="TAB_PUNCH_MGMT"
-                            class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200">打卡管理</button>
-                        <!-- 3. 表單審核 -->
-                        <button id="tab-form-review-btn" data-i18n="TAB_FORM_REVIEW"
-                            class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200">表單審核</button>
-                        <!-- 4. 排班 -->
-                        <button id="tab-scheduling-btn" data-i18n="TAB_SCHEDULING" style="display: none;"
-                            class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200">排班</button>
+                            class="py-2 px-4 rounded-full font-bold text-sm text-gray-600 bg-gray-200">打卡地點</button>
                     </div>
                 </div>
-
-                <section id="employee-mgmt-view" class="space-y-6" style="display: block;">
-
-                    <div class="card p-6 mt-6">
-
-                        <h2 data-i18n="EMPLOYEE_CALENDAR_TITLE"
-                            class="text-xl font-bold text-gray-800 dark:text-white mb-4">
-                            員工資料設定
-                        </h2>
-                        <div class="mb-4">
-                            <label for="admin-select-employee-mgmt"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                選擇員工:
-                            </label>
-                            <select id="admin-select-employee-mgmt"
-                                class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                <option value="">-- 請選擇一位員工 --</option>
-                            </select>
-                        </div>
-
-                        <div id="employee-detail-card" style="display: none;">
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div
-                                    class="setting-card lg:col-span-2 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                                    <div
-                                        class="flex items-center mb-6 border-b border-gray-200 dark:border-gray-700 pb-6">
-                                        <img id="mgmt-employee-avatar"
-                                            src="https://placehold.co/80x80/E0F2FE/1E3A8A?text=User"
-                                            onerror="this.onerror=null;this.src='https://placehold.co/80x80/E0F2FE/1E3A8A?text=User'"
-                                            alt="Employee Avatar"
-                                            class="w-20 h-20 rounded-full object-cover mr-6 border-4 border-indigo-400 dark:border-indigo-500 shadow-lg flex-shrink-0 ring-2 ring-indigo-200 dark:ring-indigo-700">
-                                        <div class="truncate flex-grow">
-                                            <h4 class="text-2xl font-bold text-gray-900 dark:text-white truncate"
-                                                id="mgmt-employee-name">
-                                                員工姓名: N/A
-                                            </h4>
-                                            <p class="text-base font-mono text-gray-500 dark:text-gray-400 mt-2"
-                                                style="display: none;" id="mgmt-employee-id">ID: N/A</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex flex-col gap-4">
-                                        <div
-                                            class="info-item bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-gray-800 dark:to-gray-700 p-4 rounded-xl shadow-md border-l-4 border-yellow-500">
-                                            <p class="text-base font-semibold text-yellow-800 dark:text-yellow-300 flex items-center"
-                                                data-i18n="SENIORITY">
-                                                <i class="fas fa-crown mr-2 text-yellow-600 dark:text-yellow-400"></i>
-                                                年資
-                                            </p>
-                                            <p class="text-3xl font-extrabold text-yellow-700 dark:text-yellow-200 mt-2"
-                                                id="mgmt-employee-seniority">
-                                                N/A
-                                            </p>
-                                        </div>
-
-                                        <div
-                                            class="info-item bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 p-4 rounded-xl shadow-md border-l-4 border-blue-500">
-                                            <p class="text-base font-semibold text-blue-800 dark:text-blue-300 flex items-center"
-                                                data-i18n="JOIN_DATE">
-                                                <i
-                                                    class="far fa-calendar-alt mr-2 text-blue-600 dark:text-blue-400"></i>
-                                                入職日期
-                                            </p>
-                                            <p class="text-2xl font-bold text-blue-700 dark:text-blue-200 mt-2"
-                                                id="mgmt-employee-join-date">
-                                                N/A
-                                            </p>
-                                        </div>
-
-                                        <div
-                                            class="info-item bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 p-4 rounded-xl shadow-md border-l-4 border-indigo-500">
-                                            <p class="text-base font-semibold text-indigo-800 dark:text-indigo-300 flex items-center"
-                                                data-i18n="EMPLOYEE_TYPE">
-                                                <i
-                                                    class="fas fa-briefcase mr-2 text-indigo-600 dark:text-indigo-400"></i>
-                                                職務狀態
-                                            </p>
-                                            <p class="text-xl font-bold text-indigo-700 dark:text-indigo-200 mt-2">
-                                                <span
-                                                    class="px-3 py-1 bg-indigo-200 text-indigo-900 dark:bg-indigo-700 dark:text-indigo-100 rounded-full text-sm font-semibold uppercase tracking-wide shadow-sm">
-                                                    正式員工
-                                                </span>
-                                            </p>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-
-                                <div
-                                    class="setting-card lg:col-span-2 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                                    <h5 class="setting-title text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center"
-                                        data-i18n="PERMISSION_ACCOUNT_SETTINGS">
-                                        <i class="fas fa-shield-alt mr-2 text-indigo-600 dark:text-indigo-400"></i>
-                                        權限設定與帳號控制
-                                    </h5>
-
-                                    <div class="space-y-4">
-                                        <div
-                                            class="flex justify-between items-center p-4 rounded-xl bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-gray-800 dark:to-gray-700 shadow-md">
-                                            <label
-                                                class="setting-label text-base font-semibold text-yellow-800 dark:text-yellow-300"
-                                                data-i18n="IS_ADMIN">管理員權限:</label>
-                                            <label class="relative inline-flex items-center cursor-pointer">
-                                                <input type="checkbox" id="toggle-admin" class="sr-only peer"
-                                                    onchange="togglePermissionsStatus(currentManagingEmployee.userId, this.checked)">
-                                                <div
-                                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 dark:peer-focus:ring-yellow-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-yellow-600">
-                                                </div>
-                                                <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                    id="admin-status">關閉</span>
-                                            </label>
-                                        </div>
-                                        <div
-                                            class="flex justify-between items-center p-4 rounded-xl bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-800 dark:to-gray-700 shadow-md">
-                                            <label
-                                                class="setting-label text-base font-semibold text-green-800 dark:text-green-300"
-                                                data-i18n="ACCOUNT_STATUS">帳號啟用狀態:</label>
-                                            <label class="relative inline-flex items-center cursor-pointer">
-                                                <input type="checkbox" id="toggle-active" class="sr-only peer"
-                                                    onchange="toggleEnableStatus(currentManagingEmployee.userId, this.checked)">
-                                                <div
-                                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600">
-                                                </div>
-                                                <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                                    id="active-status">關閉</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div
-                                    class="setting-card lg:col-span-2 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                                    <h5 class="setting-title text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center"
-                                        data-i18n="LEAVE_SALARY_SETTINGS">
-                                        <i class="fas fa-money-bill-wave mr-2 text-blue-600 dark:text-blue-400"></i>
-                                        薪資設定
-                                    </h5>
-                                    <form id="form-leave-salary" onsubmit="handleLeaveSalaryUpdate(event)">
-                                        <div class="space-y-4">
-                                            <div>
-                                                <label for="basic-salary"
-                                                    class="setting-label block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                                                    data-i18n="BASIC_SALARY">基本薪資 (NTD/月):</label>
-                                                <input type="range" id="basic-salary" class="accent-blue-600 w-full h-2"
-                                                    name="basicSalary" min="0" max="100000" step="100"
-                                                    oninput="document.getElementById('salary-value').innerText = this.value">
-                                                <div class="text-right text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    目前值: <span id="salary-value">0</span> NTD
-                                                </div>
-                                            </div>
-                                            <button type="button"
-                                                onclick="setEmployeeSalary(currentManagingEmployee.userId, document.getElementById('basic-salary').value)"
-                                                class="w-full py-3 px-4 rounded-lg font-bold bg-blue-500 hover:bg-blue-600 text-white shadow-md transition duration-150"
-                                                data-i18n="BTN_SAVE">
-                                                儲存設定
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-
-                                <div
-                                    class="setting-card lg:col-span-2 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                                    <h5 class="setting-title text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center"
-                                        data-i18n="PUNCH_POLICY_SETTINGS">
-                                        <i class="fas fa-map-marker-alt mr-2 text-indigo-600 dark:text-indigo-400"></i>
-                                        打卡政策設定
-                                    </h5>
-                                    <form id="form-punch-policy" onsubmit="handlePunchPolicyUpdate(event)">
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div
-                                                class="flex items-center p-4 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 shadow-md">
-                                                <input type="checkbox" id="require-gps" name="requireGps"
-                                                    class="checkbox-field w-5 h-5 text-indigo-600 dark:text-indigo-400 rounded focus:ring-indigo-500 dark:focus:ring-indigo-400">
-                                                <label for="require-gps"
-                                                    class="ml-3 text-base font-medium text-indigo-800 dark:text-indigo-300"
-                                                    data-i18n="REQUIRE_GPS"> GPS 定位</label>
-                                            </div>
-                                            <div
-                                                class="flex items-center p-4 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 shadow-md">
-                                                <input type="checkbox" id="allow-manual-adjust" name="allowManualAdjust"
-                                                    class="checkbox-field w-5 h-5 text-indigo-600 dark:text-indigo-400 rounded focus:ring-indigo-500 dark:focus:ring-indigo-400">
-                                                <label for="allow-manual-adjust"
-                                                    class="ml-3 text-base font-medium text-indigo-800 dark:text-indigo-300"
-                                                    data-i18n="ALLOW_MANUAL_ADJUST">Wifi BSSID</label>
-                                            </div>
-                                        </div>
-                                        <button type="submit"
-                                            class="mt-6 py-3 px-4 rounded-lg font-bold bg-indigo-500 hover:bg-indigo-600 text-white shadow-md w-full transition duration-150"
-                                            data-i18n="BTN_SAVE">
-                                            儲存政策
-                                        </button>
-                                    </form>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div id="mgmt-placeholder" style="display: block;"
-                            class="mb-4 text-center py-10 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-inner">
-                            <i class="fas fa-info-circle text-3xl text-indigo-400 mb-2"></i>
-                            <p class="font-semibold" data-i18n="MSG_PLEASE_SELECT_EMPLOYEE">請先從上方選單選擇一位員工以查看或修改詳細設定。</p>
-                            <p class="text-sm mt-1 text-gray-500">（資料將自動載入）</p>
-                        </div>
-                    </div>
-
-                    <div class="card p-6 mt-6">
-                        <h2 data-i18n="EMPLOYEE_CALENDAR_TITLE"
-                            class="text-xl font-bold text-gray-800 dark:text-white mb-4">員工日曆檢視</h2>
-                        <div class="mb-4">
-                            <label for="admin-select-employee"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">選擇員工:</label>
-                            <select id="admin-select-employee"
-                                class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                <option value="">-- 請選擇一位員工 --</option>
-                            </select>
-                        </div>
-
-                        <div id="admin-employee-calendar-card" style="display: none;">
-                            <div class="flex justify-between items-center mb-4">
-                                <button id="admin-prev-month-btn" class="p-2 text-blue-600 dark:text-blue-400">&lt;
-                                    上個月</button>
-                                <h3 id="admin-current-month-display" class="text-lg font-semibold dark:text-white"></h3>
-                                <button id="admin-next-month-btn" class="p-2 text-blue-600 dark:text-blue-400">下個月
-                                    &gt;</button>
-                            </div>
-                            <div id="admin-calendar-grid" class="grid grid-cols-7 gap-1 text-center text-sm">
-                                <div class="font-bold text-red-600 dark:text-red-400">日</div>
-                                <div class="font-bold">一</div>
-                                <div class="font-bold">二</div>
-                                <div class="font-bold">三</div>
-                                <div class="font-bold">四</div>
-                                <div class="font-bold">五</div>
-                                <div class="font-bold text-blue-600 dark:text-blue-400">六</div>
-                            </div>
-
-                            <p id="admin-calendar-info" class="text-sm text-gray-500 mt-4 dark:text-gray-400"></p>
-                            <!-- 在管理員日曆 HTML 中，放在日曆格子之後 -->
-                            <button id="export-admin-month-excel-btn" class="mt-2 w-full py-2 px-3 rounded-lg
-                                       bg-green-100 text-green-800
-                                       dark:bg-green-600 dark:text-white
-                                       border border-green-200 dark:border-green-700
-                                       text-sm font-medium shadow-sm
-                                       hover:bg-green-200 dark:hover:bg-green-700
-                                       focus:outline-none focus:ring-2 focus:ring-green-400">
-                                匯出月曆 Excel
-                            </button>
-                            <button id="toggle-admin-salary-btn"
-                                class="mt-4 mb-2 w-full text-left px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-sm font-medium"
-                                aria-expanded="false" type="button">
-                                顯示月薪摘要 ▼
-                            </button>
-                            <div id="admin-monthly-salary-display"
-                                class="mt-2 p-3 bg-gray-100 dark:bg-gray-600 rounded-lg" style="display: none;">
-                            </div>
-
-                        </div>
-
-                        <div id="admin-daily-records-card" class="card p-6 mt-6" style="display: none;">
-                            <h3 id="admin-daily-records-title" class="text-xl font-bold dark:text-white mb-4"></h3>
-
-                            <ul id="admin-daily-records-list" class="space-y-3">
-                            </ul>
-
-                            <div id="admin-records-loading" style="display: none;"
-                                class="text-center text-gray-500 py-4">
-                                正在載入紀錄...</div>
-                            <div id="admin-daily-records-empty" style="display: none;"
-                                class="text-center text-gray-500 py-4">該日沒有打卡紀錄。</div>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="punch-mgmt-view" class="space-y-6" style="display: none;">
-                    <div class="card p-6 mt-6">
-                        <h2 data-i18n="ADD_LOCATION_TITLE"
-                            class="text-xl font-bold text-gray-800 mb-2  dark:text-white mb-1">新增打卡地點</h2>
-                        <p data-i18n="ADD_LOCATION_DESCRIPTION" class="text-gray-500 mb-4">輸入地點名稱，並使用您的當前位置作為經緯度。</p>
-
-                        <!-- 地標搜尋（Admin 新增地點） -->
-                        <div id="admin-map-search" class="mb-3">
-                            <label for="admin-map-search-input" class="sr-only">搜尋地標</label>
-                            <div class="relative">
-                                <input id="admin-map-search-input" type="text" placeholder="搜尋地標或地址..."
-                                    autocomplete="off"
-                                    class="w-full py-2 px-3 rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
-                                <button id="admin-map-search-clear"
-                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-gray-500"
-                                    aria-label="清除搜尋" style="display:none">✕</button>
-                            </div>
-                            <ul id="admin-map-search-results" class="admin-map-search-results mt-1" role="listbox"
-                                aria-label="搜尋結果"></ul>
-                        </div>
-
-                        <!-- Admin Add Location Map -->
-                        <div id="admin-add-location-map"
-                            class="w-full h-64 rounded-lg mb-4 bg-gray-200 dark:bg-gray-800 relative">
-                            <!-- 覆蓋層：地圖載入中（會在 JS 中隱藏） -->
-                            <div id="admin-map-loading" class="admin-map-loading text-sm">地圖載入中...</div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label data-i18n="LOCATION_NAME_LABEL" for="location-name"
-                                    class="block text-sm font-medium text-gray-700">地點名稱</label>
-                                <input type="text" id="location-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm
-                                    dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            </div>
-                            <div>
-                                <label data-i18n="COORDINATES_LAT_LNG_LABEL"
-                                    class="block text-sm font-medium text-gray-700">經緯度 (Latitude / Longitude)</label>
-                                <div class="mt-1 flex space-x-2">
-                                    <input type="text" id="location-lat" placeholder="緯度" readonly class="block w-1/2 rounded-md border-gray-300 bg-gray-100 shadow-sm sm:text-sm
-                                        dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                    <input type="text" id="location-lng" placeholder="經度" readonly class="block w-1/2 rounded-md border-gray-300 bg-gray-100 shadow-sm sm:text-sm
-                                        dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                </div>
-                            </div>
-
-                            <!-- 新增：設定打卡地點範圍（公尺） -->
-                            <div>
-                                <label for="location-radius-slider"
-                                    class="block text-sm font-medium text-gray-700">打卡範圍</label>
-                                <div class="mt-2 flex items-center space-x-3">
-                                    <input id="location-radius-slider" type="range" min="10" max="500" step="10"
-                                        value="100" class="w-full" />
-                                    <span id="location-radius-display"
-                                        class="w-20 text-sm text-gray-700 dark:text-gray-200 text-right">50 m</span>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">拖移滑桿以調整允許打卡的半徑（公尺）。</p>
-                            </div>
-
-                            <button data-i18n="GET_LOCATION_BTN" id="get-location-btn"
-                                class="w-full py-2 px-4 rounded-lg font-bold btn-secondary">取得當前位置</button>
-                            <div id="add-location-wrapper" class="relative">
-                                <button data-i18n="ADD_LOCATION_BTN" id="add-location-btn"
-                                    class="w-full py-2 px-4 rounded-lg font-bold btn-primary" disabled>新增地點</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="form-review-view" class="space-y-6" style="display: none;">
-                    <div class="card p-6">
-                        <div class="flex justify-between items-center mb-1">
-                            <h2 data-i18n="PENDING_REQUESTS_TITLE"
-                                class="text-xl font-bold text-gray-800 dark:text-white">
-                                待審核請求</h2>
-                            <button id="toggle-requests-btn"
-                                class="text-gray-600 dark:text-gray-400 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-transform">
-                                <span id="toggle-requests-icon">▼</span>
-                            </button>
-                        </div>
-                        <p data-i18n="PENDING_REQUESTS_DESCRIPTION" class="text-gray-500 mb-4">請處理員工提出的補打卡或虛擬卡請求。</p>
-                        <div id="pending-requests-content">
-                            <div id="pending-requests-container">
-                                <div id="requests-loading" data-i18n="REQUESTS_LOADING"
-                                    class="text-center text-gray-500 py-4">正在載入請求...</div>
-                                <div id="requests-empty" class="text-center text-green-600 bg-green-50 p-4 rounded-lg"
-                                    style="display: none;">
-                                    <p data-i18n="REQUESTS_EMPTY_TITLE" class="font-semibold">太棒了！</p>
-                                    <p data-i18n="REQUESTS_EMPTY_MESSAGE">目前沒有任何待審核的請求。</p>
-                                </div>
-                                <ul id="pending-requests-list" class="space-y-3"></ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="scheduling-view" class="space-y-6" style="display: none;">
-                    <div class="card p-6">
-                        <h2 class="text-xl font-bold text-gray-800 mb-1 dark:text-white mb-1">
-                            未解鎖功能</h2>
-                        <p class="text-gray-500 mb-4">請聯絡開發人員</p>
-                    </div>
-                    <div class="card p-6 mt-6" style="display: none;">
-                        <h2 data-i18n="API_TEST_TITLE"
-                            class="text-xl font-bold text-gray-800 mb-2  dark:text-white mb-1">
-                            API 測試區</h2>
-                        <p data-i18n="API_TEST_DESCRIPTION" class="text-gray-500 mb-4">點擊下方按鈕以測試新的 API 功能。</p>
-                        <div>
-                            <button data-i18n="API_TEST_BTN" id="test-api-btn"
-                                class="w-full py-2 px-4 rounded-lg font-bold btn-primary">測試 API</button>
-                        </div>
-                    </div>
-                </section>
-
             </section>
         </div>
+
         <footer class="mt-8 text-center text-sm text-gray-500">
             <p>
                 <span data-i18n="APP_TITLE">零點考勤系統</span> v1.0 |
                 <span class="text-gray-400">
                     <span data-i18n="FOOTER_CREDITS_PREFIX">由</span>
                     <a href="https://github.com/0rigind1865-bit" class="hover:underline">0J</a>
-                    <span data-i18n="FOOTER_CREDITS_SUFFIX">製作</span> |
-                    <a data-i18n="FOOTER_SPONSOR" href="https://buymeacoffee.com/0rigind186u"
-                        class="hover:underline">點此贊助此專案</a>
+                    <span data-i18n="FOOTER_CREDITS_SUFFIX">製作</span>
                 </span>
-            </p>
-            <p class="text-xs text-gray-400 mt-1">
-                <span data-i18n="FOOTER_OPEN_SOURCE">這是一個開源專案，歡迎貢獻。</span>
             </p>
         </footer>
     </div>
-    <!-- 作者資訊區塊 -->
 
-    <!-- Notification -->
     <div id="notification" class="notification">
         <p id="notification-message"></p>
     </div>
 
-    <script src="js/config.js"></script>
-    <script src="js/state.js"></script>
-    <script src="js/core.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/punch.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/location.js"></script>
-    <!-- SheetJS for Excel export -->
+    <!-- ================================================================= -->
+    <!--                       核心控制腳本區                                -->
+    <!-- ================================================================= -->
+    
+    <!-- 1. 引入 LINE 官方 LIFF SDK 與必要外部套件 -->
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="js/admin.js"></script>
 
-    <!-- Floating LINE button (樣式與行為移到 compiled.css / js/app.js) -->
-    <button id="floating-line-btn" class="floating-line-btn" aria-label="加入員工 LINE 頻道" title="長按可隱藏"
-        data-line-url="https://lin.ee/vOQCBjv">
-        💬
-    </button>
- <script>
-   <!-- ==================== 強制解鎖登入外掛 ==================== -->
+    <!-- 2. 完全防禦性外掛核心程式碼 -->
     <script>
     (function() {
-        const myGasUrl = "https://script.google.com/macros/s/AKfycbxifYSE0fyn5LlZS-DcIjREKFi2SJJ2VWQOD_FWuKW819nosTyQE4mXnh-fCpIkjC1s/exec"; 
+        // ==================== 【填入設定區】 ====================
+        const myLiffId = "2010231696-xAAFb5F8"; // 👈 貼上你申請的 LINE LIFF ID
+        const myGasUrl = "https://script.google.com/macros/s/AKfycbxifYSE0fyn5LlZS-DcIjREKFi2SJJ2VWQOD_FWuKW819nosTyQE4mXnh-fCpIkjC1s/exec";             // 👈 貼上你第一階段複製的 GAS /exec 網址
+        // =======================================================
 
-        console.log("【GAS外掛】安全監聽模式已啟動。");
+        let realUserProfile = { lineId: "Web_Test_Mode", name: "網頁測試員" };
 
-        // 🚀 新增：強制把原本被系統隱藏或鎖定的登入按鈕秀出來，並綁定登入功能
-        const checkLoginBtn = setInterval(() => {
-            const loginBtn = document.getElementById('login-btn');
-            if (loginBtn) {
-                clearInterval(checkLoginBtn);
-                loginBtn.style.display = 'block'; // 強制顯示按鈕
-                
-                // 幫登入按鈕強制綁定 LINE 官方登入
-                loginBtn.addEventListener('click', function(e) {
-                    e.stopImmediatePropagation();
-                    if (typeof liff !== 'undefined') {
-                        liff.login();
-                    } else {
-                        alert("LINE LIFF 尚未載入完成，請稍候再試。");
-                    }
-                });
-                console.log("【GAS外掛】已強制啟動 LINE 登入按鈕！");
-            }
-        }, 500);
+        console.log("【考勤核心】正在以純淨防禦模式啟動...");
 
-        // 定時檢查打卡按鈕（登入成功後才會出現）
-        const checkBtnInterval = setInterval(() => {
+        // 函式：強制翻開主 UI 畫面
+        function forceOpenSystemUI() {
+            const loginSection = document.getElementById('login-section');
+            const mainApp = document.getElementById('main-app');
+            const userHeader = document.getElementById('user-header');
+            
+            if (loginSection) loginSection.style.display = 'none';
+            if (mainApp) mainApp.style.display = 'block';
+            if (userHeader) userHeader.style.display = 'flex';
+            
+            // 清理原本原生程式碼卡住的文字
+            const mapLoading = document.getElementById('map-loading-text');
+            if (mapLoading) mapLoading.innerText = "已成功串接雲端試算表系統";
+        }
+
+        // 函式：綁定打卡按鈕點擊事件
+        function bindClockButtons() {
             const btnPunchIn = document.getElementById('punch-in-btn');
             const btnPunchOut = document.getElementById('punch-out-btn');
 
             if (btnPunchIn && btnPunchOut) {
-                clearInterval(checkBtnInterval);
-                btnPunchIn.addEventListener('click', function(e) {
-                    e.stopImmediatePropagation();
-                    handleFinalPunch("上班");
-                });
-                btnPunchOut.addEventListener('click', function(e) {
-                    e.stopImmediatePropagation();
-                    handleFinalPunch("下班");
-                });
-                console.log("【GAS外掛】已成功綁定【上班/下班】按鈕！");
+                // 使用 onclick 覆蓋，徹底防範舊專案其他 JS 檔案的干擾
+                btnPunchIn.onclick = function() { sendDataToGoogleSheets("上班"); };
+                btnPunchOut.onclick = function() { sendDataToGoogleSheets("下班"); };
+                console.log("【考勤核心】上班/下班按鈕事件監聽成功。");
+            } else {
+                console.error("【錯誤】找不到打卡按鈕元素");
             }
-        }, 500);
+        }
 
-        function handleFinalPunch(type) {
+        // 核心：LIFF 初始化與認證流程
+        if (myLiffId && myLiffId !== "請改填你的LINE_LIFF_ID") {
+            liff.init({ liffId: myLiffId })
+                .then(() => {
+                    if (!liff.isLoggedIn()) {
+                        console.log("導向 LINE 登入授權...");
+                        liff.login();
+                    } else {
+                        // 登入成功，讀取真實用戶資料
+                        liff.getProfile()
+                            .then(profile => {
+                                realUserProfile.lineId = profile.userId;
+                                realUserProfile.name = profile.displayName;
+                                
+                                // 將真實姓名與頭像渲染至畫面上
+                                const domName = document.getElementById('user-name');
+                                const domImg = document.getElementById('profile-img');
+                                if (domName) domName.innerText = profile.displayName;
+                                if (domImg && profile.pictureUrl) domImg.src = profile.pictureUrl;
+                                
+                                console.log("【LINE認證成功】歡迎回來: " + profile.displayName);
+                                forceOpenSystemUI();
+                                bindClockButtons();
+                            })
+                            .catch(err => {
+                                alert("讀取 LINE 個人資料失敗: " + err);
+                                forceOpenSystemUI();
+                                bindClockButtons();
+                            });
+                    }
+                })
+                .catch(err => {
+                    console.error("LIFF 初始化失敗, 切換至預設模式:", err);
+                    forceOpenSystemUI();
+                    bindClockButtons();
+                });
+        } else {
+            // 未填 LIFF_ID 時，自動進入純網頁開發測試模式
+            console.log("未偵測到 LIFF_ID，啟動瀏覽器預設測試環境");
+            forceOpenSystemUI();
+            bindClockButtons();
+        }
+
+        // 函式：將打卡資料推送至後端 GAS
+        function sendDataToGoogleSheets(punchType) {
+            // 動態取得當前畫面顯示的姓名
             const domName = document.getElementById('user-name');
-            const userName = (domName && domName.innerText !== "使用者名稱") ? domName.innerText : "真實員工";
-            
-            let lineUserId = "LINE_USER";
-            if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
-                const context = liff.getContext();
-                if (context && context.userId) lineUserId = context.userId;
-            }
+            const finalName = (domName && domName.innerText !== "使用者名稱") ? domName.innerText : realUserProfile.name;
 
-            const payload = { lineId: lineUserId, name: userName, type: type };
+            const payload = {
+                lineId: realUserProfile.lineId,
+                name: finalName,
+                type: punchType
+            };
+
+            // 手機端彈出提示，以便確認點擊成功觸發
+            alert(`【傳送提示】即將送出【${finalName}】的${punchType}打卡紀錄...`);
 
             fetch(myGasUrl, {
                 method: "POST",
                 body: JSON.stringify(payload),
                 redirect: "follow",
-                headers: { "Content-Type": "text/plain;charset=utf-8" }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success") {
-                    alert(`🎉 【${userName}】${type}打卡成功！`);
-                } else {
-                    alert(`❌ 後端錯誤：${data.message}`);
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
                 }
             })
-            .catch(err => alert(`🚨 連線失敗：${err.message}`));
+            .then(res => {
+                if (!res.ok) throw new Error("網路伺服器無回應，狀態碼: " + res.status);
+                return res.json();
+            })
+            .then(data => {
+                if (data.status === "success") {
+                    alert(`🎉 打卡成功！\n雲端試算表回應：${data.message}`);
+                } else {
+                    alert(`❌ 寫入失敗，後端錯誤：${data.message}`);
+                }
+            })
+            .catch(err => {
+                alert(`🚨 連線失敗！\n原因：${err.message}\n請確認您的 GAS 部署設定是否開放給 Anyone。`);
+                console.error("詳細連線錯誤:", err);
+            });
         }
     })();
     </script>
