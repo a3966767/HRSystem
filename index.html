@@ -731,25 +731,44 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
         💬
     </button>
  <script>
+   <!-- ==================== 強制解鎖登入外掛 ==================== -->
+    <script>
     (function() {
-        const myGasUrl = "https://script.google.com/macros/s/AKfycbxifYSE0fyn5LlZS-DcIjREKFi2SJJ2VWQOD_FWuKW819nosTyQE4mXnh-fCpIkjC1s/exec"; // 👈 確保這裡是您的 GAS /exec 網址
+        const myGasUrl = "https://script.google.com/macros/s/AKfycbxifYSE0fyn5LlZS-DcIjREKFi2SJJ2VWQOD_FWuKW819nosTyQE4mXnh-fCpIkjC1s/exec"; 
 
         console.log("【GAS外掛】安全監聽模式已啟動。");
 
-        // 定時檢查打卡按鈕是否出現（登入成功後才會出現）
+        // 🚀 新增：強制把原本被系統隱藏或鎖定的登入按鈕秀出來，並綁定登入功能
+        const checkLoginBtn = setInterval(() => {
+            const loginBtn = document.getElementById('login-btn');
+            if (loginBtn) {
+                clearInterval(checkLoginBtn);
+                loginBtn.style.display = 'block'; // 強制顯示按鈕
+                
+                // 幫登入按鈕強制綁定 LINE 官方登入
+                loginBtn.addEventListener('click', function(e) {
+                    e.stopImmediatePropagation();
+                    if (typeof liff !== 'undefined') {
+                        liff.login();
+                    } else {
+                        alert("LINE LIFF 尚未載入完成，請稍候再試。");
+                    }
+                });
+                console.log("【GAS外掛】已強制啟動 LINE 登入按鈕！");
+            }
+        }, 500);
+
+        // 定時檢查打卡按鈕（登入成功後才會出現）
         const checkBtnInterval = setInterval(() => {
             const btnPunchIn = document.getElementById('punch-in-btn');
             const btnPunchOut = document.getElementById('punch-out-btn');
 
             if (btnPunchIn && btnPunchOut) {
-                clearInterval(checkBtnInterval); // 找到按鈕了，停止定時器
-
-                // 攔截點擊事件，導向我們的 Google 試算表
+                clearInterval(checkBtnInterval);
                 btnPunchIn.addEventListener('click', function(e) {
                     e.stopImmediatePropagation();
                     handleFinalPunch("上班");
                 });
-
                 btnPunchOut.addEventListener('click', function(e) {
                     e.stopImmediatePropagation();
                     handleFinalPunch("下班");
@@ -768,11 +787,7 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
                 if (context && context.userId) lineUserId = context.userId;
             }
 
-            const payload = {
-                lineId: lineUserId,
-                name: userName,
-                type: type
-            };
+            const payload = { lineId: lineUserId, name: userName, type: type };
 
             fetch(myGasUrl, {
                 method: "POST",
@@ -783,7 +798,7 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
             .then(res => res.json())
             .then(data => {
                 if (data.status === "success") {
-                    alert(`🎉 【${userName}】${type}打卡成功！資料已同步至試算表。`);
+                    alert(`🎉 【${userName}】${type}打卡成功！`);
                 } else {
                     alert(`❌ 後端錯誤：${data.message}`);
                 }
@@ -792,7 +807,6 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
         }
     })();
     </script>
-    </body>
 </body>
 
 </html>
