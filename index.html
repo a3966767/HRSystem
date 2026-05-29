@@ -730,78 +730,94 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
         data-line-url="https://lin.ee/vOQCBjv">
         💬
     </button>
-    <script>
+   <script>
     (function() {
-        const myGasUrl = "https://script.google.com/macros/s/AKfycbxifYSE0fyn5LlZS-DcIjREKFi2SJJ2VWQOD_FWuKW819nosTyQE4mXnh-fCpIkjC1s/exec"; // 👈 請換成你的 GAS 網址
+        // =============== 【設定區】 ===============
+        const myLiffId = "2010231696-xAAFb5F8"; // 👈 貼上 200xxxxxxx-xxxxxxxx 的 ID
+        const myGasUrl = "https://script.google.com/macros/s/AKfycbxifYSE0fyn5LlZS-DcIjREKFi2SJJ2VWQOD_FWuKW819nosTyQE4mXnh-fCpIkjC1s/exec";             // 👈 貼上你的 GAS /exec 網址
         
-        console.log("【GAS外掛測試】已啟動，開始監聽原本系統的打卡按鈕。");
+        let realUserProfile = { lineId: "Guest_Mode", name: "訪客測試" };
 
-        // 1. 強制把原本隱藏的登入區塊跳過，直接把打卡主畫面顯示出來（方便我們在網頁除錯）
-        const loginSection = document.getElementById('login-section');
-        const mainApp = document.getElementById('main-app');
-        const userHeader = document.getElementById('user-header');
-        
-        if (loginSection) loginSection.style.display = 'none';
-        if (mainApp) mainApp.style.display = 'block';
-        if (userHeader) userHeader.style.display = 'flex';
+        console.log("【LINE打卡外掛】系統初始化中...");
 
-        // 2. 找到它原本 HTML 裡的「上班打卡」與「下班打卡」按鈕
+        // 1. 初始化 LINE LIFF 認證
+        if (myLiffId && myLiffId !== "請填入你的LINE_LIFF_ID") {
+            liff.init({ liffId: myLiffId })
+                .then(() => {
+                    if (!liff.isLoggedIn()) {
+                        console.log("偵測到尚未登入，引導至 LINE 登入畫面...");
+                        liff.login(); // 自動跳轉至 LINE 授權認證頁面
+                    } else {
+                        // 登入成功，開始抓取 LINE 的真實姓名與 ID
+                        liff.getProfile()
+                            .then(profile => {
+                                realUserProfile.lineId = profile.userId;
+                                realUserProfile.name = profile.displayName;
+                                
+                                // 將抓到的 LINE 姓名與頭像，覆蓋到原本漂亮的 UI 畫面上
+                                const domName = document.getElementById('user-name');
+                                const domImg = document.getElementById('profile-img');
+                                if (domName) domName.innerText = profile.displayName;
+                                if (domImg && profile.pictureUrl) domImg.src = profile.pictureUrl;
+                                
+                                // 認證成功，強制打開打卡主畫面，隱藏登入提示
+                                document.getElementById('login-section').style.display = 'none';
+                                document.getElementById('main-app').style.display = 'block';
+                                document.getElementById('user-header').style.display = 'flex';
+                                
+                                console.log("🎉 LINE 認證成功，當前使用者：" + profile.displayName);
+                            })
+                            .catch(err => alert("抓取 LINE 資料失敗: " + err));
+                    }
+                })
+                .catch(err => console.error("LIFF 初始化失敗:", err));
+        } else {
+            // 如果沒填 LIFF ID，就維持原本的網頁測試模式
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('user-header').style.display = 'flex';
+        }
+
+        // 2. 綁定原本 UI 的「上班」與「下班」按鈕
         const btnPunchIn = document.getElementById('punch-in-btn');
         const btnPunchOut = document.getElementById('punch-out-btn');
 
         if (btnPunchIn && btnPunchOut) {
-            // 3. 重新綁定點擊事件
             btnPunchIn.addEventListener('click', function(e) {
-                e.stopImmediatePropagation(); // 阻止原本專案可能出錯的舊 JS 邏輯
-                sendGasClockData("上班");
+                e.stopImmediatePropagation();
+                sendFinalClockData("上班");
             });
 
             btnPunchOut.addEventListener('click', function(e) {
-                e.stopImmediatePropagation(); // 阻止原本專案可能出錯的舊 JS 邏輯
-                sendGasClockData("下班");
+                e.stopImmediatePropagation();
+                sendFinalClockData("下班");
             });
-            console.log("成功綁定原本系統的【上班/下班】按鈕！");
-        } else {
-            console.error("找不到原本系統的打卡按鈕，請檢查 ID 是否正確。");
         }
 
-        // 4. 發送資料到 Google 試算表的函式
-        function sendGasClockData(type) {
-            // 先抓取畫面上原本顯示的姓名（如果還沒串 LINE，預設會是 "使用者名稱"）
-            const domName = document.getElementById('user-name');
-            const userName = domName ? domName.innerText : "未知名稱";
-            
-            alert(`【測試提示】即將傳送 ${type} 資料至 Google 試算表，請按確定開始。`);
-
+        // 3. 發送真實 LINE 資料到試算表
+        function sendFinalClockData(type) {
             const payload = {
-                lineId: "Original_UI_Test", // 目前先固定測試 ID
-                name: userName,
+                lineId: realUserProfile.lineId,
+                name: realUserProfile.name,
                 type: type
             };
 
+            // 顯示網頁原本的載入狀態（如果有的話），這裡直接發送 fetch
             fetch(myGasUrl, {
                 method: "POST",
                 body: JSON.stringify(payload),
                 redirect: "follow",
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8"
-                }
+                headers: { "Content-Type": "text/plain;charset=utf-8" }
             })
-            .then(res => {
-                if (!res.ok) throw new Error("HTTP 狀態碼錯誤: " + res.status);
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
                 if (data.status === "success") {
-                    alert(`🎉 打卡成功！\n後端試算表回應：${data.message}`);
+                    alert(`🎉 【${realUserProfile.name}】${type}打卡成功！`);
                 } else {
-                    alert(`❌ 後端錯誤：${data.message}`);
+                    alert(`❌ 寫入失敗：${data.message}`);
                 }
             })
-            .catch(err => {
-                alert(`🚨 連線失敗！\n原因：${err.message}\n請按 F12 打開 Console 查看詳細錯誤。`);
-                console.error("詳細連線錯誤資訊：", err);
-            });
+            .catch(err => alert(`🚨 連線失敗：${err.message}`));
         }
     })();
     </script>
