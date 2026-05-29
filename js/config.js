@@ -21,7 +21,7 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
 
 const API_CONFIG = {
   // 正式環境的 API URL
-  apiUrl: "https://script.google.com/macros/s/AKfycbzAAXNnwGmeJ-Aupjsb-i-7H0BrdBMcDMLckqWAqL1rjWDQ3inryrTdlGNrFiMwIHL5/exec",
+  apiUrl: "https://script.google.com/macros/s/AKfycbzyGvd-qEc2-arxEnnPFDZvgBmifBo7khuePOLw8NjGQmiwMtOrtNTRcYAPlK8KgXpP/exec",
   // 新增回呼網址
   redirectUrl: "https://a3966767.github.io/HRSystem/"
   // 你也可以在這裡加入其他設定，例如：
