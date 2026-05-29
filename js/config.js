@@ -18,13 +18,10 @@ along with 0riginAttendance-System. If not, see <https://www.gnu.org/licenses/>.
 Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this project.
  */
 // config.js
+const CONFIG = {
+    // 1. 把這裡換成你剛剛在 LINE Developers 申請到的真實 LIFF ID
+    LIFF_ID: '2010231696-xAAFb5F8', 
 
-const API_CONFIG = {
-  // 正式環境的 API URL
-  apiUrl: "https://script.google.com/macros/s/AKfycbzyGvd-qEc2-arxEnnPFDZvgBmifBo7khuePOLw8NjGQmiwMtOrtNTRcYAPlK8KgXpP/exec",
-  // 新增回呼網址
-  redirectUrl: "https://a3966767.github.io/HRSystem/"
-  // 你也可以在這裡加入其他設定，例如：
-  // timeout: 5000,
-  // version: 'v1.0'
+    // 2. 這是原本專案的後端設定，因為我們用外掛接走了，這裡先填你的 GAS 網址即可
+    API_URL: 'https://script.google.com/macros/s/AKfycbxifYSE0fyn5LlZS-DcIjREKFi2SJJ2VWQOD_FWuKW819nosTyQE4mXnh-fCpIkjC1s/exec' 
 };
