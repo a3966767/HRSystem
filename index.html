@@ -730,13 +730,13 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
         data-line-url="https://lin.ee/vOQCBjv">
         💬
     </button>
-  <script>
+ <script>
     (function() {
-        const myGasUrl = "https://script.google.com/macros/s/AKfycbxifYSE0fyn5LlZS-DcIjREKFi2SJJ2VWQOD_FWuKW819nosTyQE4mXnh-fCpIkjC1s/exec"; // 👈 請填入你的 GAS /exec 網址
+        const myGasUrl = "https://script.google.com/macros/s/AKfycbxifYSE0fyn5LlZS-DcIjREKFi2SJJ2VWQOD_FWuKW819nosTyQE4mXnh-fCpIkjC1s/exec"; // 👈 確保這裡是您的 GAS /exec 網址
 
-        console.log("【GAS外掛】開始監聽原生按鈕...");
+        console.log("【GAS外掛】安全監聽模式已啟動。");
 
-        // 定時檢查按鈕是否載入完成，並重新綁定
+        // 定時檢查打卡按鈕是否出現（登入成功後才會出現）
         const checkBtnInterval = setInterval(() => {
             const btnPunchIn = document.getElementById('punch-in-btn');
             const btnPunchOut = document.getElementById('punch-out-btn');
@@ -744,7 +744,7 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
             if (btnPunchIn && btnPunchOut) {
                 clearInterval(checkBtnInterval); // 找到按鈕了，停止定時器
 
-                // 解除原本可能干擾的舊事件，綁定新邏輯
+                // 攔截點擊事件，導向我們的 Google 試算表
                 btnPunchIn.addEventListener('click', function(e) {
                     e.stopImmediatePropagation();
                     handleFinalPunch("上班");
@@ -754,16 +754,14 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
                     e.stopImmediatePropagation();
                     handleFinalPunch("下班");
                 });
-                console.log("【GAS外掛】打卡按鈕攔截綁定成功！");
+                console.log("【GAS外掛】已成功綁定【上班/下班】按鈕！");
             }
         }, 500);
 
         function handleFinalPunch(type) {
-            // 自動去抓取原本系統中已經透過 LINE 登入成功顯示的真實姓名
             const domName = document.getElementById('user-name');
-            const userName = (domName && domName.innerText !== "使用者名稱") ? domName.innerText : "未知名稱";
+            const userName = (domName && domName.innerText !== "使用者名稱") ? domName.innerText : "真實員工";
             
-            // 嘗試從原生專案狀態或全域抓取 LINE userId，若無則留空
             let lineUserId = "LINE_USER";
             if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
                 const context = liff.getContext();
@@ -785,15 +783,16 @@ Please credit "0J (Lin Jie / 0rigin1856)" when redistributing or modifying this 
             .then(res => res.json())
             .then(data => {
                 if (data.status === "success") {
-                    alert(`🎉 【${userName}】${type}打卡成功！資料已寫入試算表。`);
+                    alert(`🎉 【${userName}】${type}打卡成功！資料已同步至試算表。`);
                 } else {
-                    alert(`❌ 後端出錯：${data.message}`);
+                    alert(`❌ 後端錯誤：${data.message}`);
                 }
             })
             .catch(err => alert(`🚨 連線失敗：${err.message}`));
         }
     })();
     </script>
+    </body>
 </body>
 
 </html>
